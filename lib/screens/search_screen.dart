@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -29,6 +30,8 @@ class _SearchScreenState extends State<SearchScreen> {
 
   dynamic startPosition;
   dynamic endPosition;
+  late String startPlaceId;
+  late String endPlaceId;
 
   late FocusNode startFocusNode;
   late FocusNode endFocusNode;
@@ -247,14 +250,13 @@ class _SearchScreenState extends State<SearchScreen> {
                       location: placePredictions[index].description!,
                       press: () async {
                         final placeId = placePredictions[index].placeId!;
-
-                        print(placePredictions[index].description!);
+                        // print(placePredictions[index].description!);
                         var details = await getPlaceDetails(placeId);
-                        var address = details['result']['formatted_address'];
-                        print(address);
                         if (startFocusNode.hasFocus) {
                           setState(() {
                             startPosition = details;
+                            startPlaceId = placeId;
+                            // inspect(startPlaceId);
                             _startSearchFieldController.text =
                                 placePredictions[index]
                                     .structuredFormatting!
@@ -264,6 +266,8 @@ class _SearchScreenState extends State<SearchScreen> {
                         } else {
                           setState(() {
                             endPosition = details;
+                            endPlaceId = placeId;
+                            // inspect(endPlaceId);
                             _endSearchFieldController.text =
                                 placePredictions[index]
                                     .structuredFormatting!
@@ -279,15 +283,31 @@ class _SearchScreenState extends State<SearchScreen> {
                               startPosition['result']['geometry']['location']
                                   ['lng']);
                           LatLng endPoint = LatLng(
-                              startPosition['result']['geometry']['location']
+                              endPosition['result']['geometry']['location']
                                   ['lat'],
-                              startPosition['result']['geometry']['location']
+                              endPosition['result']['geometry']['location']
                                   ['lng']);
+                          double startPointLat = startPosition['result']
+                              ['geometry']['location']['lat'];
+                          double startPointLng = startPosition['result']
+                              ['geometry']['location']['lng'];
+                          double endPointLat = endPosition['result']['geometry']
+                              ['location']['lat'];
+                          double endPointLng = endPosition['result']['geometry']
+                              ['location']['lng'];
                           // ignore: use_build_context_synchronously
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>  MapScreen(startPoint: startPoint, endPoint:endPoint),
+                              builder: (context) => MapScreen(
+                                  startPoint: startPoint,
+                                  endPoint: endPoint,
+                                  startPointLat: startPointLat,
+                                  startPointLng: startPointLng,
+                                  endPointLat: endPointLat,
+                                  endPointLng: endPointLng,
+                                  startPlaceId: startPlaceId,
+                                  endPlaceId: endPlaceId),
                               fullscreenDialog: true,
                             ),
                           );

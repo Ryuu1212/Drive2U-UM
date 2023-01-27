@@ -20,7 +20,7 @@ class LocationListTile extends StatelessWidget {
         ListTile(
           onTap: press,
           horizontalTitleGap: 0,
-          leading: const CircleAvatar(child: Icon(Icons.pin_drop_rounded, color: Colors.white), backgroundColor: kBackgroundColor),
+          leading: const Icon(Icons.pin_drop_rounded, color: kBackgroundColor),
           title: Text(
             location,
             maxLines: 2,
